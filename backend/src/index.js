@@ -1,19 +1,16 @@
-import express from 'express'
-const app = express () 
-import authRoutes from "./routes/auth.js"
-import dotenv from "dotenv"
-import {connectDB} from "../lib/db.js"
+import express from 'express';
+import dotenv from 'dotenv';
+import { connectDB } from '../lib/db.js';
+import authRoutes from './routes/auth.js';
 
+// Load env variables before using them
+dotenv.config();
 
-//config env variables in order to use them in the app
-dotenv.config()
+const app = express();
 
-const PORT = process.env.PORT || 5001
-
-
-app.use('/api/auth', authRoutes)
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-    console.log(`Yaaaay the server is running on port ${PORT}`)
-    connectDB()
-})
+  console.log(`Yaaaay the server is running on port ${PORT}`);
+  connectDB();
+});
