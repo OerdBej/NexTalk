@@ -1,6 +1,6 @@
-import User from "../models/user-model";
-import bcrypt from "bcrypt";
-
+import User from "../models/user-model.js";
+import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/utils.js";
 export const signup = async (req, res) => {
   const { email, fullName, password } = req.body;
   try {
@@ -19,28 +19,20 @@ export const signup = async (req, res) => {
     const newUser = new User({ email, fullName, password: hashedPassword });
 
     if (newUser) {
-      // here we need to generate a token
+      // here we need to generate a token        //here is to generate the token JWT - using function to make it more reausable to send cookies to the response
+      generateToken(newUser._id, res);
+      await newUser.save();
+      res.status(201).json({
+        _id: newUser._id,
+        email: newUser.email,
+        fullName: newUser.fullName,
+      });
     } else {
       res.status(400).json({ message: "Invalid User Data" });
     }
-    //if the user is created successfully, than send a response
-    if(newUser) {
-        //here is to generate the token JWT - using function to make it more reausable to send cookies to the response
-        generateToken(newUser._id, res)
-        await newUser.save()
-        res.status(201).json({
-          _id: newUser._id,
-          email: newUser.email,
-          fullName: newUser.fullName
-        })
-
-    } else {
-        res.status(400).json({message:'Invalid user data'})
-    }
-
   } catch (error) {
-    console.log('error in signup controller', error.message)
-    res.status(500).json({message: error.message})
+    console.log("error in signup controller", error.message);
+    res.status(500).json({ message: error.message });
   }
 };
 

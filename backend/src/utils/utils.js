@@ -4,7 +4,7 @@ export const generateToken = (userId, res) => {
   console.log("generateToken");
 
   //here to create the token in order to differentiate the users from each others with
-  const token  = jwt.sing({userId}, process.env.JWT_SECRET, {expiresIn: '10d'} )
+  const token  = jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: '10d'} )
 
   //here to send the token in the cookies
   res.cookie("jwt", token, {
