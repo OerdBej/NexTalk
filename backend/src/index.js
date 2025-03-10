@@ -14,11 +14,11 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware setup
 app.use(express.json());
+
+//allow cookies to be parse the cookies = to grab values from the cookies
 app.use(cookieParser());
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true
-}));
+
+
 
 // Routes
 app.use('/api/auth', authRoutes);
