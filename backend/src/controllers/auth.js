@@ -80,3 +80,7 @@ export const logout = (req, res) => {
     console.log("Error in logout controller", error.message);
   }
 };
+
+export const updateProfile = async (req,res) => {
+
+}
