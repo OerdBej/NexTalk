@@ -72,6 +72,7 @@ export const login = async (req, res) => {
   }s
 };
 
+//logout controller just clear the cookie
 export const logout = (req, res) => {
   try {
     res.cookie("jwt", "",{maxAge:0})
