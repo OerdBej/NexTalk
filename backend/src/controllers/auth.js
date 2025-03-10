@@ -25,7 +25,7 @@ export const signup = async (req, res) => {
     const newUser = new User({ email, fullName, password: hashedPassword });
 
     if (newUser) {
-      // here we need to generate a token        //here is to generate the token JWT - using function to make it more reausable to send cookies to the response
+      // Generate JWT token function and set it in cookie for authentication and authorization
       generateToken(newUser._id, res);
       await newUser.save();
       res.status(201).json({
@@ -42,34 +42,34 @@ export const signup = async (req, res) => {
   }
 };
 
+
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
-
-  //check if the users exist in database
   try {
     const user = await User.findOne({ email });
-    //if there is no user, return error
+
     if (!user) {
-      return res.status(400).json({ message: "invalid credentials" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    //if the user existed, bcrypt.compare a method that compares the password from req.body with the hashed password
-    const isPassword = await bcrypt.compare(password, user.password);
-
-    if (!isPassword) {
-      return res.status(400).json({ message: "invalid credentials" });
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    //generate token
-    generateToken(user._id, res)
+    generateToken(user._id, res);
+
     res.status(200).json({
-      _id:user._id,
-      fullName:user.email,
-      profilePic:user.profilePic,
-    })
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
   } catch (error) {
-    console.log("Error in login controller", error.message)
-  }s
+    console.log("Error in login controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 export const logout = (req, res) => {
