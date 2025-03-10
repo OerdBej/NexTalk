@@ -1,6 +1,8 @@
 import User from "../models/user-model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/utils.js";
+
+//signup controller
 export const signup = async (req, res) => {
   const { email, fullName, password } = req.body;
   try {
@@ -40,10 +42,41 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = (req, res) => {
-  res.send("login controller route");
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  //check if the users exist in database
+  try {
+    const user = await User.findOne({ email });
+    //if there is no user, return error
+    if (!user) {
+      return res.status(400).json({ message: "invalid credentials" });
+    }
+
+    //if the user existed, bcrypt.compare a method that compares the password from req.body with the hashed password
+    const isPassword = await bcrypt.compare(password, user.password);
+
+    if (!isPassword) {
+      return res.status(400).json({ message: "invalid credentials" });
+    }
+
+    //generate token
+    generateToken(user._id, res)
+    res.status(200).json({
+      _id:user._id,
+      fullName:user.email,
+      profilePic:user.profilePic,
+    })
+  } catch (error) {
+    console.log("Error in login controller", error.message)
+  }s
 };
 
 export const logout = (req, res) => {
-  res.send("logout controller route");
+  try {
+    res.cookie("jwt", "",{maxAge:0})
+    res.status(200).json({message:"Logged out successfully"})
+  } catch (error) {
+    console.log("Error in logout controller", error.message);
+  }
 };
