@@ -5,6 +5,8 @@ import { generateToken } from "../utils/utils.js";
 //signup controller
 export const signup = async (req, res) => {
   const { email, fullName, password } = req.body;
+
+  //check if the fields are filled
   try {
     if (!email || !fullName || !password) {
       return res.status(400).json({ message: "Please fill in all the fields" });
@@ -15,6 +17,16 @@ export const signup = async (req, res) => {
         .status(400)
         .json({ message: "Password must be at least 6 characters" });
     }
+
+    const isValidEmail = (email) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "Please enter a valid email address" });
+    }
+
     // check if the user already exists
     const user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "User already exists" });
@@ -22,11 +34,14 @@ export const signup = async (req, res) => {
     //than create a salt and hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    //create a new user in the database
     const newUser = new User({ email, fullName, password: hashedPassword });
+
 
     if (newUser) {
       // Generate JWT token function and set it in cookie for authentication and authorization
       generateToken(newUser._id, res);
+      //save it to the db
       await newUser.save();
       res.status(201).json({
         _id: newUser._id,
