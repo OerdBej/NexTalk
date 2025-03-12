@@ -26,7 +26,9 @@ export const signup = async (req, res) => {
     };
 
     if (!isValidEmail(email)) {
-      return res.status(400).json({ message: "Please enter a valid email address" });
+      return res
+        .status(400)
+        .json({ message: "Please enter a valid email address" });
     }
 
     // check if the user already exists
@@ -38,7 +40,6 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     //create a new user in the database
     const newUser = new User({ email, fullName, password: hashedPassword });
-
 
     if (newUser) {
       // Generate JWT token function and set it in cookie for authentication and authorization
@@ -59,13 +60,8 @@ export const signup = async (req, res) => {
   }
 };
 
-
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
-
-
-
 
   try {
     const user = await User.findOne({ email });
@@ -96,29 +92,34 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.cookie("jwt", "",{maxAge:0})
-    res.status(200).json({message:"Logged out successfully"})
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller", error.message);
   }
 };
 
-export const updateProfile = async (req,res) => {
-
+export const updateProfile = async (req, res) => {
   try {
     //we have access to the user id from the authentication middleware protectedRoute
     const userId = req.user._id;
 
-    if(!userId) {
-      return res.status(400).json({message: "User ID not found"})
+    if (!userId) {
+      return res.status(400).json({ message: "User ID not found" });
     }
 
     //if provided than update the profile pic to cloudinary
+    const upload = await cloudinary.uploader.upload(profilePic);
+    //update the user profile pic in the db for the user id
 
-
+    // update the user profile pic in the db for the user id and return the updated user with the new profile pic using the secure_url that cloudinary provides for the uploaded image
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadResponse.secure_url },
+      { new: true }
+    );
+    res.status(200).json(updatedUser);
   } catch (error) {
     console.log("Error in updateProfile controller", error.message);
   }
-
-
-}
+};
