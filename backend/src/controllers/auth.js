@@ -1,6 +1,7 @@
 import User from "../models/user-model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/utils.js";
+import cloudinary from "../../lib/claudinary.js";
 
 //signup controller
 export const signup = async (req, res) => {
@@ -18,6 +19,7 @@ export const signup = async (req, res) => {
         .json({ message: "Password must be at least 6 characters" });
     }
 
+    //regex user email
     const isValidEmail = (email) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
@@ -61,6 +63,10 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
+
+
+
+
   try {
     const user = await User.findOne({ email });
 
@@ -68,6 +74,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    //check if the password is correct
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -97,5 +104,21 @@ export const logout = (req, res) => {
 };
 
 export const updateProfile = async (req,res) => {
+
+  try {
+    //we have access to the user id from the authentication middleware protectedRoute
+    const userId = req.user._id;
+
+    if(!userId) {
+      return res.status(400).json({message: "User ID not found"})
+    }
+
+    //if provided than update the profile pic to cloudinary
+
+
+  } catch (error) {
+    console.log("Error in updateProfile controller", error.message);
+  }
+
 
 }

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user-model.js";
-import cookieParser from "cookie-parser";
+
 //next function to call the next middleware
 export const protectRouter = async (req,res,next) => {
   try {
@@ -17,6 +17,7 @@ export const protectRouter = async (req,res,next) => {
       return res.status(401).json({message: 'Invalid token'})
     }
 
+    //find the user by the id in the decoded token
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
       return res.status(401).json({message: 'User not found'});
