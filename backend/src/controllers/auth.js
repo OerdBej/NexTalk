@@ -123,3 +123,14 @@ export const updateProfile = async (req, res) => {
     console.log("Error in updateProfile controller", error.message);
   }
 };
+
+
+//check if the user is authenticated
+export const checkAuth = async (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in checkAuth controller", error.message);
+    res.status(500).json({message: "Internal Server Error"})
+  }
+};

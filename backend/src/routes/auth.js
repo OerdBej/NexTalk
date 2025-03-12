@@ -13,5 +13,6 @@ router.post("/logout",logout )
 //appending route, if user want to update profile FIRST let's check if user is logged in
 router.put("/update-profile", protectRouter, updateProfile)
 
+router.get("/check", protectRouter,checkAuth)
 
 export default router;
